@@ -227,7 +227,7 @@ bool USampledTraceComponent::CacheWindowSamples(FSampledTraceActiveWindow& Windo
         for (const FName SocketName : Settings.TraceSockets)
         {
             FVector LocalPoint = FVector::ZeroVector;
-            if (!EvaluateSocketLocalPositionAtSequenceTime(Sequence, SocketName, SequenceTime, LocalPoint, OutError))
+            if (!EvaluateSocketLocalPositionAtSequenceTime(Settings, Sequence, SocketName, SequenceTime, LocalPoint, OutError))
             {
                 return false;
             }
@@ -776,9 +776,10 @@ bool USampledTraceComponent::ResolveMontageTimeToSequence(const UAnimMontage* Mo
     return false;
 }
 
-bool USampledTraceComponent::EvaluateSocketLocalPositionAtSequenceTime(const UAnimSequence* Sequence, FName SocketName, float SequenceTime,
+bool USampledTraceComponent::EvaluateSocketLocalPositionAtSequenceTime(const FSampledTraceSettings& Settings, const UAnimSequence* Sequence, FName SocketName, float SequenceTime,
     FVector& OutLocalPosition, FString& OutError) const
 {
+    FName BaseSocket = SocketName;
     if (!Sequence)
     {
         OutError = "Sequence is null.";
@@ -791,6 +792,9 @@ bool USampledTraceComponent::EvaluateSocketLocalPositionAtSequenceTime(const UAn
         OutError = "Sequence has no skeleton.";
         return false;
     }
+
+    if (Settings.PointProvider)
+        SocketName = Settings.PointProviderBaseSocket;
 
     const USkeletalMeshSocket* Socket = Skeleton->FindSocket(SocketName);
     if (!Socket)
@@ -840,6 +844,15 @@ bool USampledTraceComponent::EvaluateSocketLocalPositionAtSequenceTime(const UAn
     const FTransform SocketRelativeToRoot = SocketLocal * BoneRelativeToRoot;
     OutLocalPosition = SocketRelativeToRoot.GetLocation();
 
+    if (Settings.PointProvider)
+    {
+        return Settings.PointProvider->OverrideSamplePoint(
+            BaseSocket,
+            BoneRelativeToRoot,
+            Socket,
+            OutLocalPosition);
+    }
+    
     return true;
 }
 

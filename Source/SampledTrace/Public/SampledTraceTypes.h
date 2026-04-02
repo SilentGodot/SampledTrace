@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SampledTracePointProvider.h"
 #include "Engine/EngineTypes.h"
 #include "SampledTraceTypes.generated.h"
 
@@ -93,7 +94,13 @@ struct FSampledTraceSettings
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SampledTrace")
     bool bDrawProcessedSegments = false;
-
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SampledTrace | PointProviderOverride")
+    TScriptInterface<ISampledTracePointProvider> PointProvider;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SampledTrace | PointProviderOverride")
+    FName PointProviderBaseSocket;
+    
     bool IsValid() const
     {
         const bool bValid =

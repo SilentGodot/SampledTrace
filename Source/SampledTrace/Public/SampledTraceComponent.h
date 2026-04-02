@@ -97,7 +97,7 @@ private:
 
     bool ResolveMontageTimeToSequence(const UAnimMontage* Montage, float MontageTime, UAnimSequence*& OutSequence, float& OutSequenceTime,
         FString& OutError) const;
-    bool EvaluateSocketLocalPositionAtSequenceTime(const UAnimSequence* Sequence, FName SocketName, float SequenceTime, FVector& OutLocalPosition,
+    bool EvaluateSocketLocalPositionAtSequenceTime(const FSampledTraceSettings& Settings, const UAnimSequence* Sequence, FName SocketName, float SequenceTime, FVector& OutLocalPosition,
         FString& OutError) const;
 
     UPROPERTY()
